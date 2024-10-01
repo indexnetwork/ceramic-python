@@ -44,6 +44,18 @@ class CeramicClient:
             logging.error(f"Error getting stream state: {str(e)}")
             raise
 
+    def get_stream_commits(self, stream_id: str) -> Dict[str, Any]:
+        try:
+            response = requests.get(f"{self.url}/api/v0/commits/{stream_id}")
+            response.raise_for_status()
+            res =  response.json()
+            genesis_cid_str = res["commits"][0]["cid"]
+            previous_cid_str = res["commits"][-1]["cid"]
+            return genesis_cid_str, previous_cid_str
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error getting stream commits: {str(e)}")
+            raise        
+
     def load_stream(self, stream_id: str, opts: Dict[str, Any]) -> Dict[str, Any]:
         try:
             response = requests.get(f"{self.url}/api/v0/streams/{stream_id}")
